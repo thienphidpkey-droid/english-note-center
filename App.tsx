@@ -1,15 +1,15 @@
-
 import React, { useState } from 'react';
-import { BookOpen, Users, Award, MapPin, Phone, Facebook, Mail, Menu, X, ArrowRight, Star, Youtube, Instagram, Calendar } from 'lucide-react';
+import { Users, MapPin, Phone, Facebook, Mail, ArrowRight, Calendar, Youtube, Instagram } from 'lucide-react';
 import { PaperCard } from './components/PaperCard';
 import { ChatBot } from './components/ChatBot';
 import { CourseModal } from './components/CourseModal';
 import { CountUp } from './components/CountUp';
+import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 import { COURSES, TEACHERS, NEWS, CONTACT_INFO, LEVEL_COLORS, BRANCHES } from './constants';
 import { Course, CourseLevel } from './types';
 
 const App: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>('ALL');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
@@ -17,53 +17,9 @@ const App: React.FC = () => {
     ? COURSES 
     : COURSES.filter(c => c.level === activeFilter);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
   return (
     <div className="min-h-screen font-sans text-gray-800 overflow-x-hidden selection:bg-secondary selection:text-white bg-[#F3F4F6]">
-      {/* Navigation */}
-      <nav className="fixed w-full z-40 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-2">
-              <div className="bg-secondary text-white p-2 rounded-sm rotate-3 shadow-sm">
-                <BookOpen size={24} />
-              </div>
-              <span className="font-bold text-2xl tracking-tight text-primary font-hand">English Note</span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8 font-medium text-gray-600">
-              <a href="#courses" className="hover:text-primary transition-colors">Khóa Học</a>
-              <a href="#teachers" className="hover:text-primary transition-colors">Giảng Viên</a>
-              <a href="#news" className="hover:text-primary transition-colors">Tin Tức</a>
-              <a href="#contact" className="hover:text-primary transition-colors">Liên Hệ</a>
-              <button className="bg-primary text-white px-5 py-2 rounded-full hover:bg-blue-600 shadow-md transition-all hover:-translate-y-0.5 font-bold text-sm">
-                Đăng Ký Ngay
-              </button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button onClick={toggleMenu} className="text-gray-600 hover:text-primary">
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Dropdown */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 animate-fade-in-down">
-            <div className="flex flex-col p-4 space-y-4 font-medium text-center">
-              <a href="#courses" onClick={toggleMenu} className="block py-2 text-gray-600">Khóa Học</a>
-              <a href="#teachers" onClick={toggleMenu} className="block py-2 text-gray-600">Giảng Viên</a>
-              <a href="#news" onClick={toggleMenu} className="block py-2 text-gray-600">Tin Tức</a>
-              <a href="#contact" onClick={toggleMenu} className="block py-2 text-gray-600">Liên Hệ</a>
-            </div>
-          </div>
-        )}
-      </nav>
+      <Header />
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 overflow-hidden relative">
@@ -370,17 +326,7 @@ const App: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black text-gray-500 py-10 text-center text-sm border-t border-gray-800">
-        <div className="container mx-auto px-4">
-           <div className="flex justify-center items-center gap-2 mb-4">
-              <BookOpen className="text-gray-700" size={20} />
-              <span className="font-bold text-gray-300 text-lg">English Note</span>
-           </div>
-           <p>© 2024 English Note Center. All rights reserved.</p>
-           <p className="mt-2 text-xs">Designed with Passion & Paper Style.</p>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Popups & Widgets */}
       <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
