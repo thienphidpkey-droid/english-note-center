@@ -1,5 +1,5 @@
 
-import { Course, CourseLevel, Teacher, NewsItem, Branch } from './types';
+import { Course, CourseLevel, Teacher, NewsItem, Branch } from './types.ts';
 
 // Map colors to levels for sticky note effect
 // Kids: Vàng, Teens: Xanh lá, IELTS: Xanh dương, Giao tiếp: Hồng, Căn bản: Cam

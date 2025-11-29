@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { BookOpen, Users, Award, MapPin, Phone, Facebook, Mail, Menu, X, ArrowRight, Star, Youtube, Instagram, Calendar } from 'lucide-react';
-import { PaperCard } from './components/PaperCard';
-import { ChatBot } from './components/ChatBot';
-import { CourseModal } from './components/CourseModal';
-import { CountUp } from './components/CountUp';
-import { COURSES, TEACHERS, NEWS, CONTACT_INFO, LEVEL_COLORS, BRANCHES } from './constants';
-import { Course, CourseLevel } from './types';
+import { PaperCard } from './components/PaperCard.tsx';
+import { ChatBot } from './components/ChatBot.tsx';
+import { CourseModal } from './components/CourseModal.tsx';
+import { CountUp } from './components/CountUp.tsx';
+import { COURSES, TEACHERS, NEWS, CONTACT_INFO, LEVEL_COLORS, BRANCHES } from './constants.ts';
+import { Course, CourseLevel } from './types.ts';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
