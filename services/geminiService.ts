@@ -3,8 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 import { COURSES, CONTACT_INFO } from '../constants';
 
 // Initialize Gemini Client
-// WARNING: API_KEY must be in process.env.API_KEY
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// WARNING: API_KEY must be in import.meta.env.VITE_GEMINI_API_KEY
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 const SYSTEM_INSTRUCTION = `
 Bạn là trợ lý ảo AI của trung tâm Anh ngữ "English Note". 
