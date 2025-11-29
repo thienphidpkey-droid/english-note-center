@@ -1,56 +1,28 @@
+import React from 'react';
 
-export enum CourseLevel {
-  KIDS = 'Tiểu Học (Cấp 1)',
-  TEENS = 'Trung Học (Cấp 2-3)',
-  IELTS = 'Luyện thi IELTS',
-  COMMUNICATION = 'Giao tiếp & Người đi làm',
-  BASIC = 'Tiếng Anh Căn Bản (Mất gốc)'
-}
-
-export interface Course {
+export interface ServiceItem {
   id: string;
   title: string;
-  level: CourseLevel;
   description: string;
-  image: string;
-  duration: string;
-  students: number;
-  // New fields for popup
-  price: string;
-  schedule: string;
-  curriculum: string[];
-  target: string;
+  icon: React.ReactNode;
 }
 
-export interface Teacher {
-  id: string;
-  name: string;
-  role: string;
-  bio: string;
-  image: string;
-  experience: string;
-}
-
-export interface NewsItem {
+export interface ProjectItem {
   id: string;
   title: string;
-  date: string;
-  summary: string;
-  tag: string;
-  image: string;
-}
-
-export interface Branch {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  image: string;
-  mapLink: string;
+  category: string;
+  imageUrl: string;
 }
 
 export interface ChatMessage {
+  id: string;
   role: 'user' | 'model';
   text: string;
-  isError?: boolean;
+}
+
+export enum SectionId {
+  HOME = 'home',
+  SERVICES = 'services',
+  PORTFOLIO = 'portfolio',
+  CONTACT = 'contact',
 }

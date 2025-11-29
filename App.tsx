@@ -1,389 +1,369 @@
-
-import React, { useState } from 'react';
-import { BookOpen, Users, Award, MapPin, Phone, Facebook, Mail, Menu, X, ArrowRight, Star, Youtube, Instagram, Calendar } from 'lucide-react';
-import { PaperCard } from './components/PaperCard.tsx';
-import { ChatBot } from './components/ChatBot.tsx';
-import { CourseModal } from './components/CourseModal.tsx';
-import { CountUp } from './components/CountUp.tsx';
-import { COURSES, TEACHERS, NEWS, CONTACT_INFO, LEVEL_COLORS, BRANCHES } from './constants.ts';
-import { Course, CourseLevel } from './types.ts';
+import React, { useState, useEffect, useRef } from 'react';
+import { Code, Layout, Smartphone, Mail, Github, Twitter, Linkedin, Palette, Layers, Zap, ExternalLink, Globe, ArrowUp, Instagram, Dribbble } from 'lucide-react';
+import NeuButton from './components/NeuButton';
+import ChatBot from './components/ChatBot';
+import HeroScene from './components/HeroScene';
+import { SectionId } from './types';
 
 const App: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string>('ALL');
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [activeSection, setActiveSection] = useState<SectionId>(SectionId.HOME);
+  const [servicesVisible, setServicesVisible] = useState(false);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const filteredCourses = activeFilter === 'ALL' 
-    ? COURSES 
-    : COURSES.filter(c => c.level === activeFilter);
+  // Smooth scroll handler with offset
+  const scrollTo = (id: SectionId) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Sticky header and Scroll-to-top visibility state
+  const [isScrolled, setIsScrolled] = useState(false);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 50);
+      setShowScrollTop(scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Intersection Observer for Services Animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setServicesVisible(true);
+          observer.disconnect(); // Only animate once
+        }
+      },
+      { threshold: 0.2 } // Trigger when 20% visible
+    );
+
+    if (servicesRef.current) {
+      observer.observe(servicesRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  const navItems = [
+    { id: SectionId.HOME, label: 'Trang chủ', colorClass: 'text-blue-500' },
+    { id: SectionId.SERVICES, label: 'Dịch vụ', colorClass: 'text-purple-500' },
+    { id: SectionId.PORTFOLIO, label: 'Dự án', colorClass: 'text-pink-500' },
+    { id: SectionId.CONTACT, label: 'Liên hệ', colorClass: 'text-teal-500' }
+  ];
 
   return (
-    <div className="min-h-screen font-sans text-gray-800 overflow-x-hidden selection:bg-secondary selection:text-white bg-[#F3F4F6]">
+    <div className="min-h-screen bg-neu-base text-gray-700 overflow-x-hidden font-sans selection:bg-purple-200 selection:text-purple-900">
+      
+      {/* Background Ambient Elements for Hyperrealism/Color */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-300/30 rounded-full blur-[100px] mix-blend-multiply animate-float"></div>
+        <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-blue-300/30 rounded-full blur-[80px] mix-blend-multiply animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-pink-300/30 rounded-full blur-[120px] mix-blend-multiply animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+
       {/* Navigation */}
-      <nav className="fixed w-full z-40 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-2">
-              <div className="bg-secondary text-white p-2 rounded-sm rotate-3 shadow-sm">
-                <BookOpen size={24} />
-              </div>
-              <span className="font-bold text-2xl tracking-tight text-primary font-hand">English Note</span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8 font-medium text-gray-600">
-              <a href="#courses" className="hover:text-primary transition-colors">Khóa Học</a>
-              <a href="#teachers" className="hover:text-primary transition-colors">Giảng Viên</a>
-              <a href="#news" className="hover:text-primary transition-colors">Tin Tức</a>
-              <a href="#contact" className="hover:text-primary transition-colors">Liên Hệ</a>
-              <button className="bg-primary text-white px-5 py-2 rounded-full hover:bg-blue-600 shadow-md transition-all hover:-translate-y-0.5 font-bold text-sm">
-                Đăng Ký Ngay
-              </button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button onClick={toggleMenu} className="text-gray-600 hover:text-primary">
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
-            </div>
+      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'py-3 bg-neu-base/90 backdrop-blur-md shadow-sm' : 'py-6 bg-transparent'}`}>
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 cursor-pointer" onClick={() => scrollTo(SectionId.HOME)}>
+            CreativeFlow.
+          </div>
+          <div className="hidden md:flex gap-4 items-center">
+            {navItems.map((item) => (
+              <NeuButton
+                key={item.id}
+                onClick={() => scrollTo(item.id)}
+                className={`!px-5 !py-2 !text-sm transition-transform hover:scale-105 ${item.colorClass} ${activeSection === item.id ? 'font-bold' : 'font-medium'}`}
+                variant="secondary"
+              >
+                {item.label}
+              </NeuButton>
+            ))}
+            <div className="w-px h-8 bg-gray-300 mx-2"></div>
+            <NeuButton onClick={() => scrollTo(SectionId.CONTACT)} className="!px-6 !py-2 !text-sm border-2 border-white/50 text-gray-700">
+              Bắt đầu ngay
+            </NeuButton>
           </div>
         </div>
-
-        {/* Mobile Dropdown */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 animate-fade-in-down">
-            <div className="flex flex-col p-4 space-y-4 font-medium text-center">
-              <a href="#courses" onClick={toggleMenu} className="block py-2 text-gray-600">Khóa Học</a>
-              <a href="#teachers" onClick={toggleMenu} className="block py-2 text-gray-600">Giảng Viên</a>
-              <a href="#news" onClick={toggleMenu} className="block py-2 text-gray-600">Tin Tức</a>
-              <a href="#contact" onClick={toggleMenu} className="block py-2 text-gray-600">Liên Hệ</a>
-            </div>
-          </div>
-        )}
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 overflow-hidden relative">
-        <div className="container mx-auto flex flex-col md:flex-row items-center gap-12">
-          <div className="md:w-1/2 space-y-6 z-10">
-            <div className="inline-block bg-secondary/10 text-secondary px-4 py-1 rounded-full text-sm font-bold tracking-wide mb-2">
-              #1 TRUNG TÂM ANH NGỮ THỰC CHIẾN
-            </div>
-            <h1 className="text-5xl md:text-6xl font-black text-gray-900 leading-tight">
-              Biến tiếng Anh thành <br/>
-              <span className="text-primary relative inline-block transform -rotate-1">
-                <span className="relative z-10 px-2">Sức mạnh</span>
-                <span className="absolute inset-0 bg-yellow-200 h-1/2 bottom-0 -z-10 rounded-sm opacity-60"></span>
-              </span> 
-              của bạn
-            </h1>
-            <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
-              Phương pháp học tập hiện đại, không gian sáng tạo như những trang giấy note đầy màu sắc. Từ mất gốc đến IELTS 8.0+, chúng tôi đồng hành cùng bạn.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <button className="bg-primary text-white px-8 py-4 rounded-lg font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
-                Kiểm tra trình độ <ArrowRight size={20} />
-              </button>
-              <button className="bg-white text-gray-700 border-2 border-gray-200 px-8 py-4 rounded-lg font-bold hover:border-primary hover:text-primary transition-all">
-                Xem lộ trình
-              </button>
-            </div>
-          </div>
-          <div className="md:w-1/2 relative">
-             {/* Decorative background blobs */}
-            <div className="absolute top-10 right-10 w-64 h-64 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-            <div className="absolute top-10 left-10 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+      {/* Main Content Wrapper */}
+      <main className="relative z-10">
+
+        {/* HERO SECTION */}
+        <section id={SectionId.HOME} className="min-h-screen flex items-center justify-center pt-20 relative scroll-mt-28">
+          <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
-            <div className="relative grid grid-cols-2 gap-4 rotate-2">
-              <PaperCard className="col-span-1" type="tape" rotate colorClass="bg-white">
-                <img loading="lazy" src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop" alt="Student" className="rounded-sm mb-3 grayscale hover:grayscale-0 transition-all duration-500" />
-                <p className="font-hand text-lg text-center font-bold text-primary">Happy Learning!</p>
-              </PaperCard>
-              <PaperCard className="col-span-1 mt-12" type="clip" colorClass="bg-yellow-50">
-                 <div className="h-full flex flex-col items-center justify-center text-center p-2">
-                    <span className="text-5xl font-black text-secondary">98%</span>
-                    <span className="text-sm font-semibold text-gray-600 mt-2">Học viên đạt mục tiêu cam kết</span>
-                 </div>
-              </PaperCard>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Courses Section */}
-      <section id="courses" className="py-20 bg-white relative">
-        <div className="absolute top-0 w-full h-12 bg-gradient-to-b from-[#F3F4F6] to-white"></div>
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-4xl font-bold mb-4">Khóa Học Đa Sắc Màu</h2>
-            <div className="w-24 h-1 bg-secondary mx-auto rounded-full mb-6"></div>
-            <p className="text-gray-600">Chọn màu sắc phù hợp với lứa tuổi và mục tiêu của bạn. Mỗi tờ note là một hành trình tri thức mới.</p>
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            <button 
-              onClick={() => setActiveFilter('ALL')}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${activeFilter === 'ALL' ? 'bg-primary text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >
-              Tất cả
-            </button>
-            {Object.values(CourseLevel).map((level) => (
-              <button
-                key={level}
-                onClick={() => setActiveFilter(level)}
-                className={`px-6 py-2 rounded-full font-medium transition-all ${activeFilter === level ? 'bg-primary text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-              >
-                {level}
-              </button>
-            ))}
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCourses.map((course) => (
-              <div key={course.id} onClick={() => setSelectedCourse(course)} className="cursor-pointer group">
-                <PaperCard 
-                  type="none" 
-                  className="h-full flex flex-col transform transition-transform group-hover:-translate-y-2" 
-                  rotate
-                  colorClass={LEVEL_COLORS[course.level]}
-                >
-                  <div className="relative overflow-hidden rounded-sm mb-4 h-48 border border-black/5">
-                    <img loading="lazy" src={course.image} alt={course.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 text-xs font-bold rounded-sm shadow-sm text-primary uppercase">
-                      {course.duration}
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{course.title}</h3>
-                  <p className="text-xs font-bold uppercase tracking-wider opacity-70 mb-3">{course.level}</p>
-                  <p className="text-gray-700/80 mb-6 flex-1 text-sm leading-relaxed">{course.description}</p>
-                  <div className="flex items-center justify-between border-t border-black/10 pt-4 mt-auto">
-                    <div className="flex items-center gap-1 opacity-70 text-sm font-medium">
-                      <Users size={16} />
-                      <span>{course.students} học viên</span>
-                    </div>
-                    <button className="font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
-                      Xem chi tiết <ArrowRight size={16} />
-                    </button>
-                  </div>
-                </PaperCard>
+            <div className="space-y-8 animate-in slide-in-from-left duration-1000 z-20">
+              <div className="inline-block px-4 py-2 rounded-full shadow-neu-pressed bg-neu-base text-blue-500 font-semibold text-sm">
+                👋 Freelance Web Designer & Developer
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Teachers Section */}
-      <section id="teachers" className="py-20 px-4 bg-[#F9FAFB]">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div className="max-w-xl">
-              <h2 className="text-4xl font-bold mb-4">Đội Ngũ "Siêu Sao"</h2>
-              <p className="text-gray-600">Những người truyền lửa đam mê, 100% có chứng chỉ giảng dạy quốc tế (TESOL/CELTA).</p>
-            </div>
-            <button className="hidden md:flex items-center gap-2 font-bold text-primary hover:text-blue-700 transition-colors mt-4 md:mt-0">
-              Xem toàn bộ đội ngũ <ArrowRight size={20} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {TEACHERS.map((teacher, idx) => (
-              <div key={teacher.id} className="relative group mt-8 sm:mt-0">
-                {/* Tape effect */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-white/50 backdrop-blur-sm border-l border-r border-gray-200 rotate-2 z-20 shadow-sm"></div>
-                
-                <div className="bg-white p-6 pt-10 rounded-sm shadow-paper hover:shadow-paper-hover transition-all duration-300 h-full flex flex-col items-center text-center border border-gray-100">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-50 shadow-md mb-4 group-hover:scale-105 transition-transform">
-                    <img loading="lazy" src={teacher.image} alt={teacher.name} className="w-full h-full object-cover" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900">{teacher.name}</h3>
-                  <p className="text-primary font-bold text-xs uppercase tracking-wide mb-3">{teacher.role}</p>
-                  <p className="text-gray-500 text-sm italic mb-4 flex-1">"{teacher.bio}"</p>
-                  <div className="w-full pt-4 border-t border-gray-100">
-                     <p className="text-xs text-gray-400 font-semibold text-left mb-1">KINH NGHIỆM:</p>
-                     <p className="text-xs text-gray-700 text-left leading-snug">{teacher.experience}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Banner with Animation */}
-      <section className="bg-primary py-16 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-        <div className="container mx-auto px-4 relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-           {[
-             { label: 'Cơ sở đào tạo', val: 5, suffix: '+' },
-             { label: 'Học viên tốt nghiệp', val: 12000, suffix: '+' },
-             { label: 'Đối tác doanh nghiệp', val: 50, suffix: '+' },
-             { label: 'Giáo viên Quốc tế', val: 100, suffix: '%' }
-           ].map((stat, idx) => (
-             <div key={idx} className="space-y-2 p-4 rounded-lg hover:bg-white/5 transition-colors">
-                <h3 className="text-4xl md:text-5xl font-black font-hand">
-                  <CountUp end={stat.val} suffix={stat.suffix} />
-                </h3>
-                <p className="text-blue-100 font-medium">{stat.label}</p>
-             </div>
-           ))}
-        </div>
-      </section>
-
-      {/* News Section */}
-      <section id="news" className="py-20 px-4 bg-white">
-        <div className="container mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center">Bảng Tin & Sự Kiện Mới Nhất</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {NEWS.map((item, index) => (
-              <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
-                <div className="h-48 overflow-hidden relative">
-                    <img loading="lazy" src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute top-4 left-4 bg-secondary text-white text-xs font-bold px-3 py-1 rounded shadow-md">
-                        {item.tag}
-                    </div>
-                </div>
-                <div className="p-6 flex-1 flex flex-col">
-                   <span className="text-xs text-gray-400 font-mono mb-2 flex items-center gap-1">
-                      <Calendar size={12}/> {item.date}
-                   </span>
-                   <h3 className="text-lg font-bold mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                       {item.title}
-                   </h3>
-                   <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-1">{item.summary}</p>
-                   <a href="#" className="text-sm font-bold text-primary hover:underline mt-auto flex items-center gap-1">
-                       Đọc tiếp <ArrowRight size={14} />
-                   </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gray-900 text-white relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start mb-16">
-            <div>
-              <div className="inline-block bg-primary px-3 py-1 rounded text-xs font-bold mb-4">KẾT NỐI NGAY</div>
-              <h2 className="text-3xl font-bold mb-6">Bạn Đã Sẵn Sàng Bứt Phá?</h2>
-              <p className="text-gray-400 mb-8">
-                Để lại thông tin hoặc ghé thăm văn phòng English Note gần nhất. Chúng tôi luôn có trà ngon và những lời khuyên bổ ích cho lộ trình của bạn.
+              <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-gray-800">
+                Biến ý tưởng thành <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+                  Hiện Thực Số
+                </span>
+              </h1>
+              <p className="text-lg text-gray-500 max-w-lg leading-relaxed">
+                Tôi tạo ra những trải nghiệm web độc đáo với phong cách Neumorphism hiện đại và hiệu ứng 3D sống động, giúp thương hiệu của bạn nổi bật.
               </p>
+              <div className="flex flex-wrap gap-4">
+                <NeuButton onClick={() => scrollTo(SectionId.PORTFOLIO)} className="text-blue-600">Xem dự án</NeuButton>
+                <NeuButton variant="secondary" onClick={() => scrollTo(SectionId.CONTACT)}>Liên hệ tôi</NeuButton>
+              </div>
               
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="bg-gray-800 p-3 rounded-full text-secondary shrink-0">
-                    <MapPin size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg">Trụ sở chính</h4>
-                    <p className="text-gray-400">{CONTACT_INFO.address}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="bg-gray-800 p-3 rounded-full text-secondary shrink-0">
-                    <Phone size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg">Hotline tư vấn</h4>
-                    <p className="text-gray-400 font-mono text-xl">{CONTACT_INFO.phone}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="bg-gray-800 p-3 rounded-full text-secondary shrink-0">
-                    <Mail size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg">Email hỗ trợ</h4>
-                    <p className="text-gray-400">{CONTACT_INFO.email}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-4 mt-10">
-                <a href="#" className="bg-[#1877F2] p-3 rounded-full hover:bg-blue-700 transition-colors shadow-lg hover:-translate-y-1">
-                  <Facebook size={20} />
-                </a>
-                <a href="#" className="bg-[#FF0000] p-3 rounded-full hover:bg-red-700 transition-colors shadow-lg hover:-translate-y-1">
-                  <Youtube size={20} />
-                </a>
-                <a href="#" className="bg-gradient-to-tr from-[#FFDC80] via-[#FD1D1D] to-[#833AB4] p-3 rounded-full hover:opacity-90 transition-opacity shadow-lg hover:-translate-y-1">
-                  <Instagram size={20} />
-                </a>
+              <div className="flex gap-6 pt-4 text-gray-400">
+                <a href="#" className="hover:text-blue-500 transition-colors"><Github size={24} /></a>
+                <a href="#" className="hover:text-blue-400 transition-colors"><Twitter size={24} /></a>
+                <a href="#" className="hover:text-blue-700 transition-colors"><Linkedin size={24} /></a>
               </div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className="h-96 bg-gray-800 rounded-2xl overflow-hidden relative group border-4 border-gray-700 shadow-2xl rotate-1">
-                {/* Simplified Map representation */}
-                <div className="w-full h-full opacity-60 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center group-hover:opacity-70 transition-opacity"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                   <div className="bg-secondary text-white p-4 rounded-full animate-bounce shadow-lg ring-4 ring-secondary/30">
-                      <MapPin size={40} fill="currentColor" />
-                   </div>
-                </div>
-                <div className="absolute bottom-6 left-6 right-6 bg-white text-gray-900 p-4 rounded-xl shadow-lg">
-                  <div className="flex justify-between items-center">
-                    <div>
-                       <p className="font-bold text-lg">English Note Center</p>
-                       <p className="text-xs text-gray-500">{CONTACT_INFO.address}</p>
+            {/* 3D Floating Element - Three.js Scene */}
+            <div className="relative hidden lg:flex justify-center items-center h-[500px] w-full max-w-[600px] mx-auto">
+               <HeroScene />
+               
+               {/* Decorative Background for 3D */}
+               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-500/10 blur-[80px] rounded-full -z-10"></div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* SERVICES SECTION */}
+        <section id={SectionId.SERVICES} ref={servicesRef} className="py-24 relative scroll-mt-28">
+          <div className="container mx-auto px-6">
+            <div className={`text-center mb-16 transition-all duration-700 transform ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">Dịch Vụ Cung Cấp</h2>
+              <p className="text-gray-500 max-w-xl mx-auto">Giải pháp toàn diện cho nhu cầu kỹ thuật số của bạn, từ thiết kế đến lập trình.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {[
+                { icon: <Palette size={40} className="text-pink-500" />, title: "UI/UX Design", desc: "Thiết kế giao diện người dùng trực quan, hiện đại, tập trung vào trải nghiệm người dùng tối ưu." },
+                { icon: <Code size={40} className="text-blue-500" />, title: "Web Development", desc: "Xây dựng website hiệu năng cao, chuẩn SEO, responsive với các công nghệ mới nhất." },
+                { icon: <Layers size={40} className="text-purple-500" />, title: "3D Visuals", desc: "Tích hợp các yếu tố 3D tương tác và hiệu ứng chuyển động mượt mà vào website." }
+              ].map((service, idx) => (
+                <div 
+                  key={idx} 
+                  className={`group p-8 rounded-3xl bg-neu-base shadow-neu hover:shadow-neu-pressed transition-all duration-700 transform hover:-translate-y-2
+                    ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}
+                  `}
+                  style={{ transitionDelay: `${idx * 150}ms` }}
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-neu-base shadow-neu flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="group-hover:animate-bounce">
+                      {service.icon}
                     </div>
-                    <div className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Opening</div>
                   </div>
+                  <h3 className="text-2xl font-bold text-gray-700 mb-3">{service.title}</h3>
+                  <p className="text-gray-500 leading-relaxed">
+                    {service.desc}
+                  </p>
                 </div>
+              ))}
             </div>
           </div>
-          
-          {/* Branch System */}
-          <div className="pt-16 border-t border-gray-800">
-            <h3 className="text-2xl font-bold mb-8 text-center">Hệ Thống Chi Nhánh</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {BRANCHES.map(branch => (
-                 <div key={branch.id} className="group relative">
-                    <PaperCard className="h-full bg-white text-gray-800 hover:-translate-y-1 transition-transform duration-300" rotate type="clip" colorClass="bg-white">
-                        <div className="h-40 -mx-6 -mt-6 mb-4 overflow-hidden relative">
-                           <img loading="lazy" src={branch.image} alt={branch.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                           <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
-                        </div>
-                        <h4 className="font-bold text-lg mb-2 text-primary">{branch.name}</h4>
-                        <div className="space-y-2 text-sm text-gray-600">
-                           <p className="flex items-start gap-2">
-                              <MapPin size={16} className="mt-0.5 shrink-0 text-secondary" />
-                              {branch.address}
-                           </p>
-                           <p className="flex items-center gap-2">
-                              <Phone size={16} className="shrink-0 text-secondary" />
-                              {branch.phone}
-                           </p>
-                        </div>
-                    </PaperCard>
+        </section>
+
+        {/* PORTFOLIO SECTION */}
+        <section id={SectionId.PORTFOLIO} className="py-24 scroll-mt-28">
+          <div className="container mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+              <div>
+                <h2 className="text-4xl font-bold text-gray-800 mb-2">Dự Án Nổi Bật</h2>
+                <p className="text-gray-500">Các website tôi đã thiết kế và xây dựng.</p>
+              </div>
+              <div className="hidden md:block">
+                 <NeuButton className="!px-6 !py-2 !text-sm">Xem tất cả trên Behance</NeuButton>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {[
+                { 
+                  title: "Heona Media", 
+                  cat: "Creative Agency", 
+                  url: "https://heonamedia.vercel.app/",
+                  image: "https://i.postimg.cc/1tcCwRGR/heona.png"
+                },
+                { 
+                  title: "Neon Glide Patin", 
+                  cat: "Sports E-commerce", 
+                  url: "https://neon-glide-patin.vercel.app/",
+                  image: "https://i.postimg.cc/C1HPkMG0/patin.png"
+                },
+                { 
+                  title: "Emerald Estate", 
+                  cat: "Real Estate", 
+                  url: "https://emerald-estate.vercel.app/",
+                  image: "https://i.postimg.cc/pTYGzVDw/emerald.png"
+                },
+                { 
+                  title: "Sen Mộc Spa", 
+                  cat: "Beauty & Wellness", 
+                  url: "https://senmocspa.vercel.app/",
+                  image: "https://i.postimg.cc/nzYRBVv6/sen.png"
+                },
+                { 
+                  title: "Minh An Studio", 
+                  cat: "Photography Portfolio", 
+                  url: "https://minh-an-studio.vercel.app/",
+                  image: "https://i.postimg.cc/wMF07Wh0/minhan_(2).png"
+                },
+                { 
+                  title: "Nha Khoa T-M-C", 
+                  cat: "Medical Clinic", 
+                  url: "https://nha-khoa-t-m-c.vercel.app/",
+                  image: "https://i.postimg.cc/C5JmzvjQ/rang.png"
+                },
+              ].map((project, idx) => (
+                <a 
+                  key={idx} 
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative group rounded-3xl bg-neu-base shadow-neu overflow-hidden aspect-[4/3] cursor-pointer hover:shadow-neu-pressed transition-all duration-300 block"
+                >
+                  {/* Image Background */}
+                  <div className="absolute inset-0">
+                     <img 
+                       src={project.image} 
+                       alt={project.title} 
+                       className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:opacity-80"
+                     />
+                     {/* Overlay for text legibility */}
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  {/* Overlay Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex justify-between items-center hover:bg-white/20 transition-colors">
+                      <div>
+                        <h3 className="text-lg font-bold text-white mb-1 drop-shadow-md">{project.title}</h3>
+                        <p className="text-white/80 text-xs font-medium uppercase tracking-wider">{project.cat}</p>
+                      </div>
+                      <div className="bg-white/20 p-2 rounded-full text-white hover:bg-blue-500 hover:text-white transition-all">
+                        <ExternalLink size={16} />
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+             <div className="mt-12 md:hidden flex justify-center">
+                 <NeuButton>Xem tất cả</NeuButton>
+              </div>
+          </div>
+        </section>
+
+        {/* CONTACT SECTION */}
+        <section id={SectionId.CONTACT} className="py-24 pb-32 scroll-mt-28">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto bg-neu-base rounded-[3rem] shadow-neu p-8 md:p-12 relative overflow-hidden">
+               {/* Decorative Circle */}
+               <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+               <div className="relative z-10 text-center mb-10">
+                 <h2 className="text-4xl font-bold text-gray-800 mb-4">Sẵn Sàng Hợp Tác?</h2>
+                 <p className="text-gray-500">Hãy để lại thông tin, tôi sẽ liên hệ lại trong vòng 24h.</p>
+               </div>
+
+               <form className="space-y-6 max-w-lg mx-auto" onSubmit={(e) => e.preventDefault()}>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold text-gray-600 ml-4">Họ tên</label>
+                     <input type="text" className="w-full bg-neu-base rounded-2xl shadow-neu-pressed p-4 outline-none text-gray-700 focus:text-blue-600 transition-colors" placeholder="Nguyễn Văn A" />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold text-gray-600 ml-4">Email</label>
+                     <input type="email" className="w-full bg-neu-base rounded-2xl shadow-neu-pressed p-4 outline-none text-gray-700 focus:text-blue-600 transition-colors" placeholder="email@example.com" />
+                   </div>
                  </div>
-               ))}
+                 
+                 <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-600 ml-4">Loại dự án</label>
+                    <div className="flex flex-wrap gap-4">
+                      {['Web Design', 'Development', 'Branding', 'Khác'].map(opt => (
+                        <label key={opt} className="cursor-pointer">
+                          <input type="radio" name="project_type" className="peer sr-only" />
+                          <div className="px-6 py-2 rounded-xl shadow-neu bg-neu-base text-gray-500 peer-checked:shadow-neu-pressed peer-checked:text-blue-600 peer-checked:font-bold transition-all text-sm">
+                            {opt}
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                 </div>
+
+                 <div className="space-y-2">
+                   <label className="text-sm font-semibold text-gray-600 ml-4">Tin nhắn</label>
+                   <textarea rows={4} className="w-full bg-neu-base rounded-2xl shadow-neu-pressed p-4 outline-none text-gray-700 focus:text-blue-600 transition-colors resize-none" placeholder="Mô tả sơ qua về ý tưởng của bạn..."></textarea>
+                 </div>
+
+                 <div className="pt-4 flex justify-center">
+                   <NeuButton type="submit" className="w-full md:w-auto !px-12">Gửi Tin Nhắn</NeuButton>
+                 </div>
+               </form>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+      </main>
 
       {/* Footer */}
-      <footer className="bg-black text-gray-500 py-10 text-center text-sm border-t border-gray-800">
-        <div className="container mx-auto px-4">
-           <div className="flex justify-center items-center gap-2 mb-4">
-              <BookOpen className="text-gray-700" size={20} />
-              <span className="font-bold text-gray-300 text-lg">English Note</span>
-           </div>
-           <p>© 2024 English Note Center. All rights reserved.</p>
-           <p className="mt-2 text-xs">Designed with Passion & Paper Style.</p>
+      <footer className="bg-neu-base pt-12 pb-6 relative z-10">
+        <div className="container mx-auto px-6 text-center">
+          <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-400 to-gray-600 mb-6">
+            CreativeFlow.
+          </div>
+          <div className="flex justify-center gap-8 mb-8 text-gray-500">
+            <a href="#" className="p-3 rounded-full shadow-neu hover:shadow-neu-pressed hover:text-blue-500 hover:scale-110 transition-all duration-300">
+              <Instagram size={24} />
+            </a>
+            <a href="#" className="p-3 rounded-full shadow-neu hover:shadow-neu-pressed hover:text-blue-500 hover:scale-110 transition-all duration-300">
+              <Dribbble size={24} />
+            </a>
+            <a href="#" className="p-3 rounded-full shadow-neu hover:shadow-neu-pressed hover:text-blue-500 hover:scale-110 transition-all duration-300">
+              <Palette size={24} />
+            </a>
+          </div>
+          <p className="text-gray-400 text-sm">
+            © {new Date().getFullYear()} CreativeFlow Design. All rights reserved.
+          </p>
         </div>
       </footer>
+      
+      {/* Scroll To Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-24 right-6 w-12 h-12 bg-neu-base shadow-neu rounded-full flex items-center justify-center text-blue-500 z-40 transition-all duration-500 hover:scale-110 hover:shadow-neu-pressed border border-white/20 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+      >
+        <ArrowUp size={24} />
+      </button>
 
-      {/* Popups & Widgets */}
-      <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
+      {/* Floating Call Button (Zalo/Hotline) */}
+      <a href="tel:xxx.xxxx.xxx" className="fixed bottom-6 left-6 z-50 flex items-center gap-2 bg-neu-base p-2 pr-4 rounded-full shadow-neu hover:shadow-neu-pressed transition-all hover:scale-105 active:scale-95 group border border-white/30">
+          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white shadow-md animate-pulse-slow">
+              <Smartphone size={20} />
+          </div>
+          <div className="flex flex-col">
+              <span className="text-xs text-gray-400 font-medium">Hotline / Zalo</span>
+              <span className="text-sm font-bold text-gray-700 glitch-text">xxx.xxxx.xxx</span>
+          </div>
+      </a>
+
+      {/* AI Chat Bot */}
       <ChatBot />
     </div>
   );
