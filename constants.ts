@@ -46,7 +46,49 @@ export const COURSES: Course[] = [
       'Kỹ năng viết luận (Essay Writing)',
       'Debate: Tranh biện tiếng Anh'
     ],
-    target: 'Điểm tổng kết trên 8.0, đỗ trường chuyên'
+    target: 'Điểm tổng kết trên 8.0, đỗ trường chuyên',
+    syllabus: [
+      {
+        week: 'Tuần 1-4',
+        topic: 'Foundation & Grammar Mastery',
+        content: [
+          'Ôn tập 12 thì cơ bản & nâng cao',
+          'Cấu trúc câu phức & mệnh đề quan hệ',
+          'Từ vựng chủ đề: Education & Environment',
+          'Kỹ năng Skimming & Scanning trong Reading'
+        ]
+      },
+      {
+        week: 'Tuần 5-8',
+        topic: 'Skill Development: Listening & Speaking',
+        content: [
+          'Luyện nghe chép chính tả (Dictation)',
+          'Phát âm chuẩn IPA & Intonation',
+          'Thuyết trình: Body Language & Eye Contact',
+          'Debate: Các chủ đề xã hội nóng hổi'
+        ]
+      },
+      {
+        week: 'Tuần 9-12',
+        topic: 'Advanced Writing & Test Prep',
+        content: [
+          'Viết đoạn văn 150 từ: Opinion & Discussion',
+          'Phân tích biểu đồ (Chart description)',
+          'Giải đề thi vào 10 chuyên các năm trước',
+          'Mock Test 1: Đánh giá năng lực giữa khóa'
+        ]
+      },
+      {
+        week: 'Tuần 13-16',
+        topic: 'Intensive Training',
+        content: [
+          'Chiến thuật làm bài trắc nghiệm nhanh',
+          'Luyện đề Cambridge (PET/FCE)',
+          'Viết luận (Essay) 250 từ',
+          'Mock Test 2 & Tổng kết khóa học'
+        ]
+      }
+    ]
   },
   {
     id: 'c3',

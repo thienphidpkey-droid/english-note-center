@@ -20,6 +20,13 @@ export interface Course {
   schedule: string;
   curriculum: string[];
   target: string;
+  syllabus?: SyllabusItem[];
+}
+
+export interface SyllabusItem {
+  week: string;
+  topic: string;
+  content: string[];
 }
 
 export interface Teacher {
