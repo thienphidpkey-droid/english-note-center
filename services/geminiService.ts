@@ -2,9 +2,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { COURSES, CONTACT_INFO } from '../constants';
 
-// Initialize Gemini Client
-// WARNING: API_KEY must be in import.meta.env.VITE_GEMINI_API_KEY
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+// Initialize Gemini Client lazily
+let ai: GoogleGenAI | null = null;
+
+const getAiClient = () => {
+  if (!ai) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("VITE_GEMINI_API_KEY is missing in .env.local");
+      return null;
+    }
+    ai = new GoogleGenAI({ apiKey });
+  }
+  return ai;
+};
 
 const SYSTEM_INSTRUCTION = `
 Bạn là trợ lý ảo AI của trung tâm Anh ngữ "English Note". 
@@ -28,7 +39,12 @@ Quy tắc trả lời:
 
 export const sendMessageToGemini = async (message: string): Promise<string> => {
   try {
-    const response = await ai.models.generateContent({
+    const client = getAiClient();
+    if (!client) {
+      return "Hệ thống chưa được cấu hình API Key. Vui lòng liên hệ admin.";
+    }
+
+    const response = await client.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: message,
       config: {
