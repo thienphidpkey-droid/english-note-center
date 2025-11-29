@@ -4,6 +4,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed header height */
 }
 body {
   background-color: #F3F4F6; /* Gray-100 */

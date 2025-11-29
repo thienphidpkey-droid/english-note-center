@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Menu, X } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <nav className="fixed w-full z-40 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <nav className={`fixed top-0 w-full z-40 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200' 
+        : 'bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm'
+    }`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-2">
